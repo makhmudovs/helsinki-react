@@ -8,6 +8,8 @@ sequenceDiagram
     server-->>browser: 302 Redirect URL
     deactivate server
 
+    browser->>browser: Browser reloads itself and causes 5 more HTTP requests
+
     browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/main.css
     activate server
     server-->>browser: the css file
