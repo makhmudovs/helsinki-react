@@ -1,21 +1,22 @@
 import React from "react";
 import Part from "./Part";
 
-interface DataItem {
-  part: string;
-  exercise: number;
+interface DataItems {
+  name: string;
+  exercises: number;
 }
 interface ContentProps {
-  data: DataItem[];
+  data: DataItems[];
 }
 
 const Content: React.FC<ContentProps> = ({ data }) => {
+  console.log(data);
   return (
-    <>
-      {data.map((d, index) => (
-        <Part key={index} part={d.part} exercise={d.exercise}/>
+    <div>
+      {data.map((d, i) => (
+        <Part key={i} part={d.name} exercise={d.exercises} />
       ))}
-    </>
+    </div>
   );
 };
 

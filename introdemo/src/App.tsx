@@ -2,25 +2,71 @@ import Content from "./Content";
 import Header from "./Header";
 import Total from "./Total";
 
+// const Button = ({ onClick, text }) => <button onClick={onClick}>{text}</button>;
+
+// const History = (props) => {
+//   if (props.allClicks.length === 0) {
+//     return <div>the app is used by pressing the button</div>;
+//   }
+
+//   return <div>button press history {props.allClicks.join(" ")}</div>;
+// };
+
+// const App = () => {
+//   const [left, setLeft] = useState(0);
+//   const [right, setRight] = useState(0);
+//   const [allClick, setAll] = useState([]);
+//   const [total, setTotal] = useState(0);
+
+//   const handleLeftClick = () => {
+//     setAll(allClick.concat("L"));
+//     setLeft(left + 1);
+//     const updatedLeft = left + 1;
+//     setTotal(updatedLeft + right);
+//   };
+//   const handleRightClick = () => {
+//     setAll(allClick.concat("R"));
+//     setRight(right + 1);
+//     const updatedRight = right + 1;
+//     setTotal(updatedRight + left);
+//   };
+//   return (
+//     <div style={{ padding: "10px" }}>
+//       {left}
+//       <Button onClick={handleLeftClick} text="left" />
+//       <Button onClick={handleRightClick} text="right" />
+//       {right}
+//       <br />
+//       <History allClicks={allClick} />
+//       <p>Total: {total}</p>
+//     </div>
+//   );
+// };
+
 const App = () => {
-  const course = "Half Stack application development";
-  const part1 = "Fundamentals of React";
-  const exercises1 = 10;
-  const part2 = "Using props to pass data";
-  const exercises2 = 7;
-  const part3 = "State of a component";
-  const exercises3 = 14;
+  const course = {
+    name: "Half Stack application development",
+    parts: [
+      {
+        name: "Fundamentals of React",
+        exercises: 10,
+      },
+      {
+        name: "Using props to pass data",
+        exercises: 7,
+      },
+      {
+        name: "State of a component",
+        exercises: 14,
+      },
+    ],
+  };
+
   return (
     <div>
-      <Header course={course} />
-      <Content
-        data={[
-          { part: part1, exercise: exercises1 },
-          { part: part2, exercise: exercises2 },
-          { part: part3, exercise: exercises3 },
-        ]}
-      />
-      <Total total={exercises1 + exercises2 + exercises3} />
+      <Header course={course.name} />
+      <Content data={course.parts} />
+      <Total parts={course.parts} />
     </div>
   );
 };
