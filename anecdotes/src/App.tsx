@@ -22,21 +22,36 @@ const App = () => {
     { id: 4, vote: 0 },
     { id: 5, vote: 0 },
     { id: 6, vote: 0 },
-    { id: 7, vote: 0 },
+    { id: 7, vote: 10 },
   ]);
+  const [maxVote, setMaxVote] = useState(null);
+
+  const setVoteWithMaxVote = () => {
+    const max = votes.reduce(
+      (prev, current) => (prev.vote > current.vote ? prev : current),
+      0
+    );
+    setMaxVote(max.id);
+  };
+
   const handleVote = () => {
     const nVotes = [...votes];
     nVotes[selected].vote += 1;
     setVotes(nVotes);
+    setVoteWithMaxVote();
   };
-  const setAnecdote = () =>
+  const setAnecdote = () => {
     setSelected(Math.floor(Math.random() * anecdotes.length));
+    setVoteWithMaxVote();
+  };
   return (
     <div>
       {anecdotes[selected]}
       <p>has {votes[selected].vote}</p>
       <button onClick={handleVote}>vote</button>
       <button onClick={setAnecdote}>next anecdote</button>
+      <h3>Anecdote with the most votes</h3>
+      {maxVote !== null ? anecdotes[maxVote] : ""}
     </div>
   );
 };
