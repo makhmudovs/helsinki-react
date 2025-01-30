@@ -10,7 +10,6 @@ interface ContentProps {
 }
 
 const Content: React.FC<ContentProps> = ({ data }) => {
-  console.log(data);
   return (
     <div>
       {data.map((d, i) => (

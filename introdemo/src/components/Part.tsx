@@ -6,8 +6,6 @@ interface PartProps {
 }
 
 const Part: React.FC<PartProps> = ({ part, exercise }) => {
-    console.log(part)
-    console.log(exercise)
   return (
     <p>
       {part} {exercise}
