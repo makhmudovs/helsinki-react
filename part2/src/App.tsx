@@ -1,18 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import NoteService from "./services/notes";
 import Note from "./conponents/note/Note";
 
-interface AppItems {
-  id: number;
-  content: string;
-  important: boolean;
-}
-
-interface AppProps {
-  notes: AppItems[];
-}
-
-const App: React.FC<AppProps> = (props) => {
-  const [notes, setNotes] = useState(props.notes);
+const App = () => {
+  const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState("a new note...");
   const [showAll, setShowAll] = useState(true);
 
@@ -21,19 +12,40 @@ const App: React.FC<AppProps> = (props) => {
     const noteObject = {
       content: newNote,
       important: Math.random() * 0.5 ? true : false,
-      id: Number(notes.length + 1),
     };
 
-    setNotes(notes.concat(noteObject));
-    setNewNote("");
+    NoteService.create(noteObject).then((returnedNote) => {
+      setNotes(notes.concat(returnedNote));
+      setNewNote("");
+    });
   };
 
   const handleNoteChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(event.target.value);
     setNewNote(event.target.value);
   };
 
-  const notesToShow = showAll ? notes : notes.filter((note) => note.important);
+  const toggleImportanceOf = (id: string) => {
+    const note = notes.find((n) => n["id"] === id);
+    const changedNote = { ...note, important: !note?.["important"] };
+
+    NoteService.update(id, changedNote)
+      .then((returnedNote) => {
+        setNotes(notes.map((note) => (note.id === id ? returnedNote : note)));
+      })
+      .catch((error) => {
+        alert(`the note '${note.content}' was already deleted from server`);
+        setNotes(notes.filter((n) => n['id'] !== id));
+      });
+  };
+  const notesToShow = showAll
+    ? notes
+    : notes.filter((note) => note["important"]);
+
+  useEffect(() => {
+    NoteService.getAll().then((initialNotes) => {
+      setNotes(initialNotes);
+    });
+  }, []);
   return (
     <>
       <h1>Notes</h1>
@@ -44,7 +56,11 @@ const App: React.FC<AppProps> = (props) => {
       </div>
       <ul>
         {notesToShow.map((note) => (
-          <Note key={note.id} note={note} />
+          <Note
+            toggleImportance={toggleImportanceOf}
+            key={note["id"]}
+            note={note}
+          />
         ))}
       </ul>
       <form onSubmit={addNote}>
