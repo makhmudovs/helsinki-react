@@ -3,12 +3,15 @@ import PersonService from "./services/person";
 import Filter from "./components/filter/Filter";
 import PersonForm from "./components/personForm/PersonForm";
 import Persons from "./components/persons/Persons";
+import Notification from "./components/notification/Notification";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newPhone, setNewPhone] = useState("");
   const [filterName, setFilterName] = useState("");
+  const [message, setMessage] = useState(null);
+  const [color, setColor] = useState("green");
 
   const getPersons = () => {
     PersonService.getAll().then((persons) => {
@@ -47,11 +50,25 @@ const App = () => {
         PersonService.updateContact(duplicateName.id, {
           name: newName,
           number: newPhone,
-        }).then((res) => {
-          setNewName("");
-          setNewPhone("");
-          getPersons();
-        });
+        })
+          .then((res) => {
+            setMessage(`${newName} added successfully`);
+            setTimeout(() => {
+              setMessage(null);
+            }, 5000);
+            setNewName("");
+            setNewPhone("");
+            getPersons();
+          })
+          .catch((err) => {
+            console.log(err);
+            setMessage(`Cannot change the number plz refresh`);
+            setColor("red");
+            setTimeout(() => {
+              setMessage(null);
+              setColor("green");
+            }, 5000);
+          });
       } else {
         return;
       }
@@ -61,11 +78,24 @@ const App = () => {
         number: newPhone,
       };
 
-      PersonService.create(personObject).then((returnData) => {
-        setPersons(persons.concat(returnData));
-        setNewName("");
-        setNewPhone("");
-      });
+      PersonService.create(personObject)
+        .then((returnData) => {
+          setPersons(persons.concat(returnData));
+          setMessage(`${newName} added successfully`);
+          setTimeout(() => {
+            setMessage(null);
+          }, 5000);
+          setNewName("");
+          setNewPhone("");
+        })
+        .catch((err) => {
+          setMessage(`${err} occured`);
+          setColor("red");
+          setTimeout(() => {
+            setMessage(null);
+            setColor("green");
+          }, 5000);
+        });
     }
   };
 
@@ -80,10 +110,22 @@ const App = () => {
     const sure = confirm(`Are you sure u want to delete person with ${id}`);
     if (sure) {
       //delete
-      PersonService.deleteContact(id).then((returnData) => {
-        console.log(returnData);
-        setPersons(persons.filter((p) => p["id"] !== returnData.id));
-      });
+      PersonService.deleteContact(id)
+        .then((returnData) => {
+          setMessage(`${returnData.name} deleted successfully`);
+          setTimeout(() => {
+            setMessage(null);
+          }, 5000);
+          setPersons(persons.filter((p) => p["id"] !== returnData.id));
+        })
+        .catch((err) => {
+          setMessage(`${err} occured`);
+          setColor("red");
+          setTimeout(() => {
+            setMessage(null);
+            setColor("green");
+          }, 5000);
+        });
     }
   };
 
@@ -93,6 +135,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification color={color} message={message} />
       <Filter filterName={filterName} handleFilterName={handleFilterName} />
       <h3>Add a new</h3>
       <PersonForm
