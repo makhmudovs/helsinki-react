@@ -13,9 +13,14 @@ interface NoteProps {
 const Note: React.FC<NoteProps> = ({ note, toggleImportance }) => {
   const label = note.important ? "make not important" : "make important";
   return (
-    <li>
+    <li className="note">
       {note.content}
-      <button style={{marginLeft:'10px'}} onClick={() => toggleImportance(note.id)}>{label}</button>
+      <button
+        style={{ marginLeft: "10px" }}
+        onClick={() => toggleImportance(note.id)}
+      >
+        {label}
+      </button>
     </li>
   );
 };
