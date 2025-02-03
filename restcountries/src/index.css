@@ -6,3 +6,7 @@
   padding: 10px;
   margin-bottom: 10px;
 }
+.app{
+  max-width: 800px;
+  margin: 10% auto auto auto;
+}
