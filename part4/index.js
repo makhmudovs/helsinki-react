@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
 app.use(express.json());
+
+
 let notes = [
   {
     id: "1",
@@ -18,6 +20,18 @@ let notes = [
     important: true,
   },
 ];
+
+
+const requestLogger = (req, res, next) => {
+  console.log("Method: ", req.method);
+  console.log("Path: ", req.path);
+  console.log("Body: ", req.body);
+  console.log("---");
+  next();
+};
+
+
+
 
 const generateId = () => {
   const maxId =
@@ -70,6 +84,7 @@ app.get("/api/notes", (req, res) => {
   res.json(notes);
 });
 
+app.use(requestLogger);
 const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
