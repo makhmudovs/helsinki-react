@@ -4,14 +4,11 @@ import Note from "./components/note/Note";
 import Notification from "./components/notification/Notification";
 import Footer from "./components/footer/Footer";
 
-
-
-
 const App = () => {
-  const [notes, setNotes] = useState([]);
+  const [notes, setNotes] =  useState<any[]>([]);
   const [newNote, setNewNote] = useState("a new note...");
   const [showAll, setShowAll] = useState(true);
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const addNote = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -38,12 +35,12 @@ const App = () => {
       .then((returnedNote) => {
         setNotes(notes.map((note) => (note.id === id ? returnedNote : note)));
       })
-      .catch((error) => {
+      .catch(() => {
         setErrorMessage(
           `Note '${note.content}' was already removed from server`
         );
         setTimeout(() => {
-          setErrorMessage(null);
+          setErrorMessage('');
         }, 5000);
         setNotes(notes.filter((n) => n["id"] !== id));
       });
