@@ -2,7 +2,7 @@ import axios from 'axios'
 const baseUrl = '/api/notes'
 
 
-let token:any = null
+let token: string | null = null
 
 
 const setToken = (newToken:string) => {

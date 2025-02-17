@@ -1,34 +1,46 @@
-import React, { FormEvent, useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import NoteService from "./services/notes";
 import LoginService from "./services/login";
 import Note from "./components/note/Note";
 import Notification from "./components/notification/Notification";
 import Footer from "./components/footer/Footer";
+import LoginForm from "./components/login/LoginForm";
+import Togglable, { TogglableRef } from "./components/toggleable/Toggleable";
+import NoteForm from "./components/NoteForm";
+
+
+interface Note {
+  content: string;
+  id: string;
+  important: boolean;
+}
+
+interface newNote {
+  content: string;
+  important: boolean;
+}
+
+interface LoginCreds {
+  username: string;
+  password: string;
+}
 
 const App = () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [notes, setNotes] = useState<any[]>([]);
-  const [newNote, setNewNote] = useState("a new note...");
   const [showAll, setShowAll] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
 
-  const addNote = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const noteObject = {
-      content: newNote,
-      important: Math.random() * 0.5 ? true : false,
-    };
+  const togglableRef = useRef<TogglableRef>(null);
 
-    NoteService.create(noteObject).then((returnedNote) => {
+  const addNote = (newNote: newNote) => {
+    if (togglableRef.current) {
+      togglableRef.current.toggleVisibility();
+    }
+    NoteService.create(newNote).then((returnedNote) => {
       setNotes(notes.concat(returnedNote));
-      setNewNote("");
     });
-  };
-
-  const handleNoteChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setNewNote(event.target.value);
   };
 
   const toggleImportanceOf = (id: string) => {
@@ -53,19 +65,12 @@ const App = () => {
     ? notes
     : notes.filter((note) => note["important"]);
 
-  const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
+  const handleLogin = async (creds: LoginCreds) => {
     try {
-      const user = await LoginService.login({
-        username,
-        password,
-      });
-      window.localStorage.setItem('loggedNoteappUser',JSON.stringify(user));
-      NoteService.setToken(user['token']);
+      const user = await LoginService.login(creds);
+      window.localStorage.setItem("loggedNoteappUser", JSON.stringify(user));
+      NoteService.setToken(user["token"]);
       setUser(user);
-      setUsername("");
-      setPassword("");
     } catch (err) {
       console.error("handle login: ", err);
       setErrorMessage("Wrong Credentials");
@@ -75,53 +80,16 @@ const App = () => {
     }
   };
 
- 
-
-  const loginForm = () => {
-    return (
-      <form onSubmit={handleLogin}>
-        <div>
-          username
-          <input
-            type="text"
-            value={username}
-            name="Username"
-            onChange={({ target }) => setUsername(target.value)}
-          />
-        </div>
-        <div>
-          password
-          <input
-            type="password"
-            value={password}
-            name="Password"
-            onChange={({ target }) => setPassword(target.value)}
-          />
-        </div>
-        <button type="submit">login</button>
-      </form>
-    );
-  };
-
-  const noteForm = () => {
-    return (
-      <form onSubmit={addNote}>
-        <input value={newNote} onChange={handleNoteChange} />
-        <button type="submit">save</button>
-      </form>
-    );
-  };
-
-
   useEffect(() => {
     NoteService.getAll().then((initialNotes) => {
+      console.log("notes", initialNotes);
       setNotes(initialNotes);
     });
   }, []);
 
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedNoteappUser');
-    if(loggedUserJSON){
+    const loggedUserJSON = window.localStorage.getItem("loggedNoteappUser");
+    if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON);
       setUser(user);
       NoteService.setToken(user.token);
@@ -147,11 +115,13 @@ const App = () => {
         ))}
       </ul>
       {user === null ? (
-        loginForm()
+        <Togglable buttonLabel="log in" ref={togglableRef}>
+          <LoginForm handleSubmit={handleLogin} />
+        </Togglable>
       ) : (
         <div>
-          <p>{user['name']} logged-in</p>
-          {noteForm()}
+          <p>{user["name"]} logged-in</p>
+          <NoteForm addNote={addNote} />
         </div>
       )}
       <Footer />
