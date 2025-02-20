@@ -2,16 +2,21 @@ import { createRoot } from "react-dom/client";
 import App from "./App";
 import { store } from "./app/store";
 import { Provider } from "react-redux";
+import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 
 const container = document.getElementById("root");
+
+const queryClient = new QueryClient();
 
 if (container) {
   const root = createRoot(container);
 
   root.render(
-    <Provider store={store}>
-      <App />
-    </Provider>
+    <QueryClientProvider client={queryClient}>
+      <Provider store={store}>
+        <App />
+      </Provider>
+    </QueryClientProvider>
   );
 } else {
   throw new Error(

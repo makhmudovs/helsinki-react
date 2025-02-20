@@ -1,22 +1,32 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { FormEvent, useState } from "react";
-import { useDispatch } from "react-redux";
-import {
-  setMessage,
-  resetMessage,
-  CrateAnecdote
-} from "../features/anecdotes/anecdoteSlice";
+import { createAnecdotes } from "../request";
+
 const AnecdoteForm = () => {
+  const queryClient = useQueryClient();
   const [anecdote, setAnecdote] = useState("");
-  const dispatch = useDispatch();
+
+  interface Anecdote {
+    id: string;
+    anecdote: string;
+    vote: number;
+  }
+
+  const newAnecdoteMutation = useMutation({
+    mutationFn: createAnecdotes,
+    onSuccess: (newAnecdote) => {
+      // queryClient.invalidateQueries({ queryKey: ["anecdotes"] });
+      const anecdotes = queryClient.getQueryData(["anecdotes"]) as Anecdote[]; // Type assertion
+      if (anecdotes) {
+        queryClient.setQueryData(["anecdotes"], anecdotes.concat(newAnecdote));
+      }
+    },
+  });
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    dispatch(CrateAnecdote(anecdote));
+    newAnecdoteMutation.mutate({ anecdote, vote: 1 });
     setAnecdote("");
-    dispatch(setMessage(`You have added ${anecdote}`));
-    setTimeout(() => {
-      dispatch(resetMessage());
-    }, 1500);
   };
   return (
     <div>
