@@ -1,38 +1,48 @@
-import axios from 'axios'
-const baseUrl = '/api/notes'
+import axios from "axios";
+// const baseUrl = '/api/notes'
+const baseUrl = "http://localhost:3004/notes";
 
+const getAll = async () => {
+  const response = await axios.get(baseUrl);
+  return response.data;
+};
 
-let token: string | null = null
+const createNew = async (content: string) => {
+  const object = { content, important: false };
+  const response = await axios.post(baseUrl, object);
+  return response.data;
+};
 
+export default { getAll, createNew };
 
-const setToken = (newToken:string) => {
-  token = `Bearer ${newToken}`
-}
+// let token: string | null = null
 
-const getAll = () => {
-  const request = axios.get(baseUrl)
-  return request.then(response => response.data)
-}
+// const setToken = (newToken:string) => {
+//   token = `Bearer ${newToken}`
+// }
 
-interface CreateObject {
-  content:string;
-  important:boolean;
-}
+// const getAll = () => {
+//   const request = axios.get(baseUrl)
+//   return request.then(response => response.data)
+// }
 
-const create = async (newObject:CreateObject) => {
-  const config = {
-    headers: { Authorization: token },
-  }
+// interface CreateObject {
+//   content:string;
+//   important:boolean;
+// }
 
+// const create = async (newObject:CreateObject) => {
+//   const config = {
+//     headers: { Authorization: token },
+//   }
 
-  const response = await axios.post(baseUrl, newObject, config)
-  return response.data
-}
+//   const response = await axios.post(baseUrl, newObject, config)
+//   return response.data
+// }
 
-const update = (id:string, newObject:CreateObject) => {
-  const request = axios.put(`${ baseUrl }/${id}`, newObject)
-  return request.then(response => response.data)
-}
+// const update = (id:string, newObject:CreateObject) => {
+//   const request = axios.put(`${ baseUrl }/${id}`, newObject)
+//   return request.then(response => response.data)
+// }
 
-
-export default { getAll, create, update, setToken }
+// export default { getAll, create, update, setToken }

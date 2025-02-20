@@ -1,17 +1,22 @@
 import { FormEvent, useState } from "react";
 import { useDispatch } from "react-redux";
-import { addAnecdote } from "../features/anecdotes/anecdoteSlice";
-
+import {
+  setMessage,
+  resetMessage,
+  CrateAnecdote
+} from "../features/anecdotes/anecdoteSlice";
 const AnecdoteForm = () => {
   const [anecdote, setAnecdote] = useState("");
   const dispatch = useDispatch();
 
-  const generateId = () => Number((Math.random() * 1000000).toFixed(0));
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    dispatch(addAnecdote({ anecdote, id: String(generateId()), vote: 1 }));
+    dispatch(CrateAnecdote(anecdote));
     setAnecdote("");
+    dispatch(setMessage(`You have added ${anecdote}`));
+    setTimeout(() => {
+      dispatch(resetMessage());
+    }, 1500);
   };
   return (
     <div>

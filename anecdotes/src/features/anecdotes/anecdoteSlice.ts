@@ -1,5 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
+import AnecdoteService from "../../services/anecdote";
+import anecdote from "../../services/anecdote";
 
 export interface AnecdoteItems {
   anecdote: string;
@@ -9,51 +11,14 @@ export interface AnecdoteItems {
 
 export interface AnecdoteState {
   anecdotes: AnecdoteItems[];
+  term: string;
+  message: string;
 }
 
 const initialState: AnecdoteState = {
-  anecdotes: [
-    { anecdote: "If it hurts, do it more often.", id: "cuyagcha", vote: 2 },
-    {
-      anecdote: "Adding manpower to a late software project makes it later!",
-      id: "abcd1234",
-      vote: 0,
-    },
-    {
-      anecdote:
-        "The first 90 percent of the code accounts for the first 90 percent of the development time...The remaining 10 percent of the code accounts for the other 90 percent of the development time.",
-      id: "efgh5678",
-      vote: 0,
-    },
-    {
-      anecdote:
-        "Any fool can write code that a computer can understand. Good programmers write code that humans can understand.",
-      id: "ijkl9101",
-      vote: 0,
-    },
-    {
-      anecdote: "Premature optimization is the root of all evil.",
-      id: "mnop1121",
-      vote: 0,
-    },
-    {
-      anecdote:
-        "Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.",
-      id: "qrst3141",
-      vote: 0,
-    },
-    {
-      anecdote:
-        "Programming without an extremely heavy use of console.log is same as if a doctor would refuse to use x-rays or blood tests when diagnosing patients.",
-      id: "uvwx5161",
-      vote: 0,
-    },
-    {
-      anecdote: "The only way to go fast, is to go well.",
-      id: "yzab7181",
-      vote: 0,
-    },
-  ],
+  anecdotes: [],
+  term: "",
+  message: "",
 };
 
 interface addAnecdote {
@@ -66,29 +31,52 @@ export const anecdoteSlice = createSlice({
   name: "anecdote",
   initialState,
   reducers: {
-    vote: (state, action: PayloadAction<string>) => {
-      state.anecdotes.map((anecdote) => {
-        if (action.payload === anecdote.id) {
-          anecdote.vote += 1;
-        }
-      });
-
-      // Sort anecdotes by votes in descending order
-      state.anecdotes.sort((a, b) => b.vote - a.vote);
+    setTerm: (state, action: PayloadAction<string>) => {
+      state.term = action.payload;
     },
-    addAnecdote: (state, action: PayloadAction<addAnecdote>) => {
-      state.anecdotes.push({
-        anecdote: action.payload.anecdote,
-        id: action.payload.id,
-        vote: action.payload.vote,
-      });
+
+    setMessage: (state, action: PayloadAction<string>) => {
+      state.message = action.payload;
+    },
+    resetMessage: (state) => {
+      state.message = "";
+    },
+    setAnecdotes: (state, action: PayloadAction<AnecdoteItems>) => {
+      state.anecdotes.push(action.payload);
+
       // Sort anecdotes by votes in descending order
       state.anecdotes.sort((a, b) => b.vote - a.vote);
     },
   },
 });
 
+export const InitializeAnecdotes = () => {
+  return async (dispatch) => {
+    const anecdotes = await AnecdoteService.getAll();
+    anecdotes.forEach((anecdote) => dispatch(setAnecdotes(anecdote)));
+  };
+};
+
+export const CrateAnecdote = (anecdote: string) => {
+  return async (dispatch) => {
+    const newAnecdote = await AnecdoteService.createNew({ anecdote, vote: 1 });
+    dispatch(setAnecdotes(newAnecdote));
+  };
+};
+
+export const Vote = (id:string)=>{
+  return async (dispatch)=>{
+    const votedAnecdote = await AnecdoteService.vote(id);
+    dispatch(setAnecdotes(votedAnecdote));
+  }
+}
+
 // Action creators are generated for each case reducer function
-export const { vote, addAnecdote } = anecdoteSlice.actions;
+export const {
+  setTerm,
+  setMessage,
+  resetMessage,
+  setAnecdotes,
+} = anecdoteSlice.actions;
 
 export default anecdoteSlice.reducer;
