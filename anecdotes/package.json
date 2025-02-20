@@ -8,12 +8,13 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "server": "json-server -p3005 --watch db.json"
+    "server": "node server.ts"
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
     "@reduxjs/toolkit": "^2.5.1",
     "@tanstack/react-query": "^5.66.7",
+    "@types/json-server": "^0.14.7",
     "axios": "^1.7.9",
     "bootstrap": "^5.3.3",
     "react": "^18.3.1",

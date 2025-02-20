@@ -3,6 +3,7 @@ import App from "./App";
 import { store } from "./app/store";
 import { Provider } from "react-redux";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+import { NotificationContextProvider } from "./NotificationContext";
 
 const container = document.getElementById("root");
 
@@ -14,7 +15,9 @@ if (container) {
   root.render(
     <QueryClientProvider client={queryClient}>
       <Provider store={store}>
-        <App />
+        <NotificationContextProvider>
+          <App />
+        </NotificationContextProvider>
       </Provider>
     </QueryClientProvider>
   );

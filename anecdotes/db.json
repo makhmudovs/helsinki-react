@@ -3,27 +3,37 @@
     {
       "anecdote": "If it hurts, do it more often.",
       "id": "cuyagcha",
-      "vote": 4
+      "vote": 5
     },
     {
       "anecdote": "Adding manpower to a late software project makes it later!",
       "id": "abcd1234",
+      "vote": 4
+    },
+    {
+      "id": "ce2c",
+      "anecdote": "sleep\n",
       "vote": 1
     },
     {
-      "id": "a4d9",
-      "anecdote": "acanajksna",
+      "id": "e0e2",
+      "anecdote": "eat",
       "vote": 1
     },
     {
-      "id": "e2e7",
-      "anecdote": "this is the shit",
-      "vote": 2
+      "id": "83ab",
+      "anecdote": "another one",
+      "vote": 1
     },
     {
-      "id": "2cc1",
-      "anecdote": "another shit\n",
-      "vote": 2
+      "id": "7b27",
+      "anecdote": "hello",
+      "vote": 1
+    },
+    {
+      "id": "a2e6",
+      "anecdote": "poo",
+      "vote": 1
     }
   ]
 }

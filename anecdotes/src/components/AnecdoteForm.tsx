@@ -1,11 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { FormEvent, useState } from "react";
 import { createAnecdotes } from "../request";
+import { useNotificationDispatch } from "../NotificationContext";
 
 const AnecdoteForm = () => {
   const queryClient = useQueryClient();
   const [anecdote, setAnecdote] = useState("");
-
+  const dispatch = useNotificationDispatch();
   interface Anecdote {
     id: string;
     anecdote: string;
@@ -26,6 +27,10 @@ const AnecdoteForm = () => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     newAnecdoteMutation.mutate({ anecdote, vote: 1 });
+    dispatch({ type: "SUCC", payload: `${anecdote} added successfully` });
+    setTimeout(() => {
+      dispatch({ type: "RESET" });
+    }, 2000);
     setAnecdote("");
   };
   return (
