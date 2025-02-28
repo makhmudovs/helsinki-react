@@ -1,18 +1,16 @@
 // @ts-ignore
 // @ts-nocheck
-import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "../app/store";
-import { setTerm, Vote } from "../features/anecdotes/anecdoteSlice";
+// import { setTerm, Vote } from "../features/anecdotes/anecdoteSlice";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getAnecdotes, updateAnecdote } from "../request";
 
 const AnecdoteList = () => {
-  const queryCLient = useQueryClient();
+  const queryClient = useQueryClient();
 
   const voteMutation = useMutation({
     mutationFn: updateAnecdote,
     onSuccess(updatedAnecdote) {
-      queryCLient.setQueryData(["anecdotes"], (oldAnecdotes) => {
+      queryClient.setQueryData(["anecdotes"], (oldAnecdotes) => {
         if (oldAnecdotes) {
           const updatedAnecdoteIndex = oldAnecdotes.findIndex(
             (anecdote) => anecdote.id === updatedAnecdote.id
