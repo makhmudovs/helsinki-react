@@ -9,17 +9,23 @@ const PersonForm = ({ setError }) => {
   const [city, setCity] = useState("");
 
   const [createPerson] = useMutation(CREATE_PERSON, {
-    refetchQueries: [{ query: ALL_PERSONS }],
     onError: (error) => {
       const messages = error.graphQLErrors.map((e) => e.message).join("\n");
       setError(messages, "error");
+    },
+    update: (cache, response) => {
+      cache.updateQuery({ query: ALL_PERSONS }, ({ allPersons }) => {
+        return {
+          allPersons: allPersons.concat(response.data.addPerson),
+        };
+      });
     },
   });
 
   const submit = (event) => {
     event.preventDefault();
 
-    createPerson({ variables: { name, phone, street, city } });
+    createPerson({ variables: { name, phone, city, street } });
 
     setName("");
     setPhone("");
@@ -83,6 +89,24 @@ const PersonForm = ({ setError }) => {
             required={true}
             value={city}
             onChange={({ target }) => setCity(target.value)}
+          />
+        </div>
+        <div className="">
+          <label
+            htmlFor="street"
+            className="block mb-2 text-sm font-light  text-gray-900 dark:text-white"
+          >
+            Street
+          </label>
+          <input
+            type="text"
+            name="street"
+            id="street"
+            className="bg-gray-50 border focus:outline-gray-200 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+            placeholder="Type street"
+            required={true}
+            value={street}
+            onChange={({ target }) => setStreet(target.value)}
           />
         </div>
         <div className="pt-2">
