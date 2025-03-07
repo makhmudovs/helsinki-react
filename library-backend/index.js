@@ -98,9 +98,9 @@ const resolvers = {
         if (!authorDoc) return [];
         query.author = authorDoc._id;
       }
-      if (genre) query.genres = genre;
+      if (genre) query.genres = { $in: [genre] }; // Only apply filter if genre is provided
       const books = await Book.find(query).populate("author");
-      return books.filter((book) => book.author && book.author.name); // Safety check
+      return books.filter(book => book.author && book.author.name);
       //need to add bookcount here too
     },
     allAuthors: async () => {
@@ -168,8 +168,6 @@ const resolvers = {
       }
       await newBook.populate("author");
       return newBook;
-
-      
     },
     addAuthor: async (root, args) => {
       const newAuthor = new Author({ ...args });

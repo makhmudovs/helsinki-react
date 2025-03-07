@@ -21,7 +21,7 @@ const BookForm = () => {
   const [published, setPublished] = useState(0);
   const [genre, setGenre] = useState("refactoring");
 
-  const [createBook] = useMutation(CREATE_BOOK, {
+  const [createBook,result] = useMutation(CREATE_BOOK, {
     refetchQueries: [{ query: ALL_BOOKS }, { query: ALL_AUTHORS }],
     onError: (error) => {
       const messages = error.graphQLErrors.map((e) => e.message).join("\n");
@@ -50,7 +50,7 @@ const BookForm = () => {
         published: Number(published),
         genres: [genre],
       };
-
+      console.log(data);
       await createBook({ variables: data });
 
       Swal.fire({
@@ -61,6 +61,7 @@ const BookForm = () => {
         timer: 1500,
         showConfirmButton: false,
       });
+      console.log(result.data);
 
       setTitle("");
       setAuthor("");
