@@ -12,12 +12,13 @@ const LoginForm = ({ setToken }) => {
     onError: (error) => {
       console.error(
         "error occured while logging the user",
-        error.graphQLErrors[0].message
+        error
       );
+      //error.graphQLErrors[0].message
       Swal.fire({
         position: "top-end",
         icon: "error",
-        title: error.graphQLErrors[0].message,
+        title: error,
         showConfirmButton: false,
         timer: 1500,
       });

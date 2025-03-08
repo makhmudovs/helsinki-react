@@ -1,6 +1,5 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
-import { ApolloClient } from "@apollo/client";
 import Navbar from "./components/Navbar";
 import Authors from "./pages/Authors";
 import Books from "./pages/Books";

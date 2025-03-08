@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { useMutation } from "@apollo/client";
-// eslint-disable-next-line no-unused-vars
+import { useMutation, useSubscription } from "@apollo/client";
 import { motion } from "framer-motion";
 import Swal from "sweetalert2";
 
-import { ALL_AUTHORS, ALL_BOOKS, CREATE_BOOK } from "../queries";
+import { ALL_BOOKS, CREATE_BOOK, BOOK_ADDED } from "../queries";
 
 import {
   Description,
@@ -14,6 +13,24 @@ import {
   DialogBackdrop,
 } from "@headlessui/react";
 
+// Function to update cache
+export const updateCache = (cache, query, addedBook) => {
+  const uniqByTitle = (a) => {
+    let seen = new Set();
+    return a.filter((item) => {
+      let k = item.title;
+      return seen.has(k) ? false : seen.add(k);
+    });
+  };
+
+  cache.updateQuery(query, (data) => {
+    const allBooks = data?.allBooks || []; // Default to empty array if allBooks is null/undefined
+    return {
+      allBooks: uniqByTitle(allBooks.concat(addedBook)),
+    };
+  });
+};
+
 const BookForm = () => {
   let [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState("");
@@ -21,16 +38,25 @@ const BookForm = () => {
   const [published, setPublished] = useState(0);
   const [genre, setGenre] = useState("refactoring");
 
-  const [createBook,result] = useMutation(CREATE_BOOK, {
-    refetchQueries: [{ query: ALL_BOOKS }, { query: ALL_AUTHORS }],
+  useSubscription(BOOK_ADDED, {
+    onData: ({ data, client }) => {
+      const addedBook = data.data.bookAdded;
+      Swal.fire({
+        position: "top-right",
+        title: "Success",
+        text: `Book added: ${addedBook.title}`,
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+      updateCache(client.cache, { query: ALL_BOOKS }, addedBook);
+    },
+  });
+
+  const [createBook, result] = useMutation(CREATE_BOOK, {
     onError: (error) => {
       const messages = error.graphQLErrors.map((e) => e.message).join("\n");
-      Swal.fire({
-        position:'top-right',
-        title: "Error",
-        text: `Failed to add: ${messages}`,
-        icon: "error",
-      });
+      console.log(messages);
     },
   });
 
@@ -54,7 +80,7 @@ const BookForm = () => {
       await createBook({ variables: data });
 
       Swal.fire({
-        position:'top-right',
+        position: "top-right",
         title: "Success!",
         text: "New book added",
         icon: "success",
@@ -69,7 +95,7 @@ const BookForm = () => {
       setGenre("refactoring");
     } catch (err) {
       Swal.fire({
-        position:'top-right',
+        position: "top-right",
         title: "Error",
         text: `Failed to add: ${err.message}`,
         icon: "error",
@@ -93,7 +119,6 @@ const BookForm = () => {
         className="overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 flex justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
       >
         <DialogBackdrop className="fixed inset-0 bg-black/30" />
-        {/* Animated Modal Content */}
         <motion.div
           className="relative p-4 w-full max-w-2xl max-h-full"
           variants={panelVariants}
@@ -103,10 +128,9 @@ const BookForm = () => {
           transition={{ duration: 0.3, ease: "easeInOut" }}
         >
           <DialogPanel className="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
-            {/* Modal header */}
             <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600 border-gray-200">
               <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white">
-                Deactivate account
+                Add New Book
               </DialogTitle>
               <button
                 onClick={() => setIsOpen(false)}
@@ -130,7 +154,6 @@ const BookForm = () => {
                 <span className="sr-only">Close modal</span>
               </button>
             </div>
-            {/* Modal body */}
             <div className="p-4 md:p-5 space-y-4">
               <Description className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
                 Add new book
@@ -185,7 +208,7 @@ const BookForm = () => {
                       name="published"
                       id="published"
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                      placeholder="$2999"
+                      placeholder="Year"
                       value={published}
                       onChange={(e) => setPublished(e.target.value)}
                       required={true}
@@ -230,7 +253,6 @@ const BookForm = () => {
                 </div>
               </form>
             </div>
-            {/* Modal footer */}
             <div className="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600"></div>
           </DialogPanel>
         </motion.div>
