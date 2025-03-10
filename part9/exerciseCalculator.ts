@@ -24,7 +24,7 @@ interface CalculatorTypes {
   average: number;
 }
 
-const exerciseCalculator = (
+export const exerciseCalculator = (
   hours: Array<number>,
   target: number
 ): CalculatorTypes => {
@@ -50,15 +50,17 @@ const exerciseCalculator = (
     rating = 1;
     ratingDescription = "Bad";
   }
+  const average = hours.reduce((a, b) => a + b, 0) / hours.length;
 
+  //success is returning incorrectly here
   return {
     periodLength: hours.length,
     trainingDays: hours.filter((h) => h !== 0).length,
-    success: hours.filter((h) => h !== 0).length > target,
+    success: average > target,
     rating,
     ratingDescription,
     target,
-    average: hours.reduce((a, b) => a + b, 0) / hours.length,
+    average,
   };
 };
 
