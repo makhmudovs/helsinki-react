@@ -1,80 +1,52 @@
-import Content from "./components/Content";
-import Header from "./components/Header";
-import Total from "./components/Total";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { DiaryEntry, NewDiaryEntry } from "./types";
+import diaryService from "./services/diaries";
+import Diaries from "./components/Diaries";
+import NewDiaryForm from "./components/NewDiaryForm";
 
 const App = () => {
-  const courseName = "Half Stack application development";
+  const [diaries, setDiary] = useState<DiaryEntry[]>([]);
+  const [error, setError] = useState<string>();
+  useEffect(() => {
+    const fetchDiaryList = async () => {
+      const diaries = await diaryService.getAll();
+      setDiary(diaries);
+    };
+    void fetchDiaryList();
+  }, []);
 
-  interface CoursePartBase {
-    name: string;
-    exerciseCount: number;
-  }
-
-  interface CourseDescription extends CoursePartBase{
-    description: string;
-  }
-
-  interface CoursePartBasic extends CourseDescription {
-    kind: "basic";
-  }
-
-  interface CoursePartGroup extends CoursePartBase {
-    groupProjectCount: number;
-    kind: "group";
-  }
-
-  interface CoursePartBackground extends CourseDescription {
-    backgroundMaterial: string;
-    kind: "background";
-  }
-
-  type CoursePart = CoursePartBasic | CoursePartGroup | CoursePartBackground;
-
-  const courseParts: CoursePart[] = [
-    {
-      name: "Fundamentals",
-      exerciseCount: 10,
-      description: "This is an awesome course part",
-      kind: "basic",
-    },
-    {
-      name: "Using props to pass data",
-      exerciseCount: 7,
-      groupProjectCount: 3,
-      kind: "group",
-    },
-    {
-      name: "Basics of type Narrowing",
-      exerciseCount: 7,
-      description: "How to go from unknown to string",
-      kind: "basic",
-    },
-    {
-      name: "Deeper type usage",
-      exerciseCount: 14,
-      description: "Confusing description",
-      backgroundMaterial:
-        "https://type-level-typescript.com/template-literal-types",
-      kind: "background",
-    },
-    {
-      name: "TypeScript in frontend",
-      exerciseCount: 10,
-      description: "a hard part",
-      kind: "basic",
-    },
-  ];
-
-  const totalExercises = courseParts.reduce(
-    (sum, part) => sum + part.exerciseCount,
-    0
-  );
-
+  const submitNewDiary = async (values: NewDiaryEntry) => {
+    try {
+      const diary = await diaryService.create(values);
+      setDiary(diaries.concat(diary));
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        if (e?.response?.data && typeof e?.response?.data === "string") {
+          const message = e.response.data.replace(
+            "Something went wrong. Error: ",
+            ""
+          );
+          console.error(message);
+          setError(message);
+        } else {
+          console.error("Unrecognized axios error");
+          setError("Unrecognized axios error");
+        }
+      } else {
+        console.error("Unknown error", e);
+        setError("Unknown error");
+      }
+    }
+  };
   return (
     <div>
-      <Header courseName={courseName} />
-      <Content courseParts={courseParts} />
-      <Total totalExercises={totalExercises} />
+      {error && (
+        <div style={{ border: "1px solid red", padding: "1rem" }}>{error}</div>
+      )}
+      <h1>home</h1>
+      <NewDiaryForm onSubmit={submitNewDiary} />
+      <Diaries diaries={diaries} />
     </div>
   );
 };
