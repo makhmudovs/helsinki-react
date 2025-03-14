@@ -92,6 +92,7 @@ const NewDiaryForm = ({ onSubmit }: Props) => {
             type="text"
             name="date"
             id="date"
+            required={true}
           />
         </div>
         <div>

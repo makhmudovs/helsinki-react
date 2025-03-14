@@ -14,6 +14,10 @@ router.get("/", (_req: Request, res: Response<NonSensitivePatientEntry[]>) => {
   res.send(patientService.getPatients());
 });
 
+router.get("/:id", (req: Request, res: Response) => {
+  res.send(patientService.getPatient(req.params.id));
+});
+
 const errorMiddleware = (
   error: unknown,
   _req: Request,
